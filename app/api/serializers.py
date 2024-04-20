@@ -1,32 +1,47 @@
+from app.models import Entrega, Fruta, Item, Pagamento, Verdura
 from rest_framework import serializers
-from app.models import Verduras, Frutas, Entrega, Pagamento, Item
 
-class VerdurasSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Verduras
-        fields = ['nmVdx', 'pXcVdX', 'stkVxL']
 
-class FrutasSerializer(serializers.ModelSerializer):
+class VerduraSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Frutas
-        fields = ['nmeFrt', 'prcFrt', 'qntdDspnvl']
+        model = Verdura
+        fields = "__all__"
+
+
+class FrutaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fruta
+        fields = "__all__"
+
+
+class PagamentoSerializer(serializers.ModelSerializer):
+    valor_total = serializers.DecimalField(
+        max_digits=5, decimal_places=2, read_only=True
+    )
+
+    class Meta:
+        model = Pagamento
+        fields = "__all__"
+
 
 class EntregaSerializer(serializers.ModelSerializer):
-    itens = serializers.PrimaryKeyRelatedField(queryset=Item.objects.all())
-    pagamento = serializers.PrimaryKeyRelatedField(queryset=Pagamento.objects.all())
+    metodo_pagamento = serializers.CharField(
+        source="pagamento.metodo_pagamento", read_only=True
+    )
+    valor_total = serializers.DecimalField(
+        source="pagamento.valor_total",
+        max_digits=5,
+        decimal_places=2,
+        read_only=True,
+    )
 
     class Meta:
         model = Entrega
-        fields = ['nmClnt', 'endrNtrg', 'dtEntrega', 'itens', 'pagamento']
+        fields = "__all__"
 
-class PagamentoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pagamento
-        fields = ['mtPgto', 'vlrTotal']
 
 class ItemSerializer(serializers.ModelSerializer):
-    entrega = serializers.PrimaryKeyRelatedField(queryset=Entrega.objects.all())
 
     class Meta:
         model = Item
-        fields = ['nmItm', 'qntdd', 'prcUnit', 'entrega']
+        fields = "__all__"
